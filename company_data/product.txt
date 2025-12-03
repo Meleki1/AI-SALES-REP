@@ -1,0 +1,301 @@
+{
+  "knowledge_base": [
+    {
+      "id": 1,
+      "problem": "Acne Breakouts",
+      "description": "Acne appears when excess oil, bacteria, and dead skin clog pores. Often triggered by hormones, stress, or harsh skincare.",
+      "skin_types_affected": ["oily", "combination"],
+      "recommended_products": [
+        {"name": "The Ordinary Niacinamide 10% + Zinc", "price": 12000},
+        {"name": "CeraVe Foaming Cleanser", "price": 15000},
+        {"name": "Neutrogena Oil-Free Acne Wash", "price": 11000}
+      ]
+    },
+    {
+      "id": 2,
+      "problem": "Whiteheads",
+      "description": "Whiteheads form when pores are clogged but remain closed, trapping oil and dead skin under the surface.",
+      "skin_types_affected": ["oily", "combination"],
+      "recommended_products": [
+        {"name": "The Ordinary Salicylic Acid 2%", "price": 14000},
+        {"name": "Paula's Choice BHA Liquid Exfoliant", "price": 27000},
+        {"name": "Cerave Renewing SA Cleanser", "price": 16000}
+      ]
+    },
+    {
+      "id": 3,
+      "problem": "Blackheads",
+      "description": "Blackheads occur when oil and dead skin plug open pores and oxidize, turning the surface dark.",
+      "skin_types_affected": ["oily", "combination"],
+      "recommended_products": [
+        {"name": "Paula's Choice 2% BHA", "price": 27000},
+        {"name": "Inkey List Salicylic Acid Cleanser", "price": 14000},
+        {"name": "Cosrx BHA Blackhead Power Liquid", "price": 20000}
+      ]
+    },
+    {
+      "id": 4,
+      "problem": "Hormonal Acne",
+      "description": "Hormonal imbalances increase oil production, causing deep painful cystic acne around the jawline.",
+      "skin_types_affected": ["oily", "combination"],
+      "recommended_products": [
+        {"name": "The Ordinary Azelaic Acid 10%", "price": 15000},
+        {"name": "La Roche-Posay Effaclar Duo", "price": 21000},
+        {"name": "CeraVe Resurfacing Retinol", "price": 18000}
+      ]
+    },
+    {
+      "id": 5,
+      "problem": "Cystic Acne",
+      "description": "Inflamed, painful bumps deep under the skin caused by bacteria and blocked oil glands.",
+      "skin_types_affected": ["oily", "combination"],
+      "recommended_products": [
+        {"name": "Differin Adapalene 0.1%", "price": 18000},
+        {"name": "The Ordinary Niacinamide", "price": 12000},
+        {"name": "Cosrx Snail Mucin", "price": 18000}
+      ]
+    },
+
+    {
+      "id": 6,
+      "problem": "Dark Spots (Hyperpigmentation)",
+      "description": "Dark spots occur after acne, sun exposure, or inflammation. Melanin collects in patches.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Alpha Arbutin Serum (The Ordinary)", "price": 12000},
+        {"name": "Garnier Vitamin C Serum", "price": 10000},
+        {"name": "Dr Rashel Vitamin C", "price": 6000}
+      ]
+    },
+
+    {
+      "id": 7,
+      "problem": "Sunburn",
+      "description": "Overexposure to UV rays damages the outer skin layer leading to redness, irritation, and peeling.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Aloe Vera Gel (Holika Holika)", "price": 7000},
+        {"name": "Nivea Soothing After Sun", "price": 8000},
+        {"name": "Cosrx Aloe Sun Cream SPF 50", "price": 15000}
+      ]
+    },
+
+    {
+      "id": 8,
+      "problem": "Dry Skin",
+      "description": "Dry skin lacks moisture due to weak skin barrier, weather, or harsh soaps.",
+      "skin_types_affected": ["dry", "normal"],
+      "recommended_products": [
+        {"name": "CeraVe Moisturizing Cream", "price": 18000},
+        {"name": "Nivea Soft Moisturizer", "price": 2500},
+        {"name": "Vaseline Cocoa Radiant", "price": 4500}
+      ]
+    },
+
+    {
+      "id": 9,
+      "problem": "Dehydrated Skin",
+      "description": "Skin feels tight because it lacks water, not oil. Common with heat, caffeine, and low hydration.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Neutrogena Hydro Boost Gel", "price": 15000},
+        {"name": "The Ordinary Hyaluronic Acid", "price": 12000},
+        {"name": "Cosrx Snail Mucin", "price": 18000}
+      ]
+    },
+
+    {
+      "id": 10,
+      "problem": "Dull Skin",
+      "description": "Skin becomes dull when dead cells build up on the surface, blocking light reflection.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Garnier Vitamin C Face Wash", "price": 7500},
+        {"name": "Pixi Glow Tonic", "price": 16000},
+        {"name": "The Ordinary Lactic Acid 5%", "price": 14000}
+      ]
+    },
+
+    {
+      "id": 11,
+      "problem": "Uneven Skin Tone",
+      "description": "Patchy discoloration caused by sun exposure, hormonal changes, or past inflammation.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Alpha Arbutin Serum", "price": 12000},
+        {"name": "Kojie San Soap", "price": 3500},
+        {"name": "Fair & White So White Cream", "price": 8000}
+      ]
+    },
+
+    {
+      "id": 12,
+      "problem": "Oily Skin",
+      "description": "Overactive sebaceous glands lead to shiny skin, clogged pores, and acne.",
+      "skin_types_affected": ["oily"],
+      "recommended_products": [
+        {"name": "CeraVe Foaming Cleanser", "price": 15000},
+        {"name": "The Ordinary Niacinamide", "price": 12000},
+        {"name": "Skin Aqua UV Gel SPF 50", "price": 10000}
+      ]
+    },
+
+    {
+      "id": 13,
+      "problem": "Large Pores",
+      "description": "Oil, dirt, and genetics can enlarge pores, making skin look rough.",
+      "skin_types_affected": ["oily", "combination"],
+      "recommended_products": [
+        {"name": "The Ordinary Niacinamide", "price": 12000},
+        {"name": "Good Molecules Niacinamide Toner", "price": 12000},
+        {"name": "Inkey List Salicylic Acid", "price": 14000}
+      ]
+    },
+
+    {
+      "id": 14,
+      "problem": "Dark Knuckles",
+      "description": "Friction, dryness, and melanin buildup cause knuckles to darken.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Kojic Acid Cream", "price": 5000},
+        {"name": "QEI+ Dark Spot Remover", "price": 15000},
+        {"name": "Alpha Arbutin Gel", "price": 12000}
+      ]
+    },
+
+    {
+      "id": 15,
+      "problem": "Dark Elbows & Knees",
+      "description": "Pressure, friction, and sun exposure cause these points to thicken and darken.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Kojie San Soap", "price": 3500},
+        {"name": "Palmers Skin Success Fade Cream", "price": 15000},
+        {"name": "Caro White Corrector", "price": 2000}
+      ]
+    },
+
+    {
+      "id": 16,
+      "problem": "Dark Inner Thighs",
+      "description": "Friction, sweat, and chafing cause hyperpigmentation.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Alpha Arbutin Serum", "price": 12000},
+        {"name": "Niacinamide Serum", "price": 12000},
+        {"name": "Kojic Acid Lotion", "price": 7000}
+      ]
+    },
+
+    {
+      "id": 17,
+      "problem": "Back Acne (Bacne)",
+      "description": "Sweat, friction, and clogged pores cause acne on the back.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "CeraVe SA Body Wash", "price": 18000},
+        {"name": "Neutrogena Body Clear Wash", "price": 12000},
+        {"name": "The Ordinary Salicylic Acid", "price": 14000}
+      ]
+    },
+
+    {
+      "id": 18,
+      "problem": "Body Odor",
+      "description": "Bacteria break down sweat leading to unpleasant smells.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Nivea Antiperspirant", "price": 3000},
+        {"name": "Dove Antiperspirant", "price": 3500},
+        {"name": "Sure Men Antiperspirant", "price": 3500}
+      ]
+    },
+
+    {
+      "id": 19,
+      "problem": "Eczema",
+      "description": "Sensitive skin barrier becomes inflamed, causing itching, redness, and dryness.",
+      "skin_types_affected": ["dry", "sensitive"],
+      "recommended_products": [
+        {"name": "CeraVe Moisturizing Cream", "price": 18000},
+        {"name": "Aveeno Eczema Therapy", "price": 16000},
+        {"name": "Vaseline Petroleum Jelly", "price": 2000}
+      ]
+    },
+
+    {
+      "id": 20,
+      "problem": "Razor Bumps",
+      "description": "Ingrown hairs caused by shaving irritation lead to bumps and dark spots.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Tend Skin Razor Bump Solution", "price": 15000},
+        {"name": "The Ordinary Glycolic Toner", "price": 14000},
+        {"name": "Aloe Vera Gel", "price": 7000}
+      ]
+    },
+
+    {
+      "id": 21,
+      "problem": "Ingrown Hairs",
+      "description": "Hair grows sideways inside the skin due to shaving or tight clothing.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Glycolic Acid Toner", "price": 14000},
+        {"name": "Tea Tree Oil", "price": 5000},
+        {"name": "Tend Skin Solution", "price": 15000}
+      ]
+    },
+
+    {
+      "id": 22,
+      "problem": "Strawberry Legs",
+      "description": "Plugged hair follicles cause small dark dots on legs.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "CeraVe SA Lotion", "price": 16000},
+        {"name": "Tree Hut Sugar Scrub", "price": 9000},
+        {"name": "Glycolic Acid Toner", "price": 14000}
+      ]
+    },
+
+    {
+      "id": 23,
+      "problem": "Stretch Marks",
+      "description": "Rapid growth or weight change causes skin fibers to stretch and tear.",
+      "skin_types_affected": ["all"],
+      "recommended_products": [
+        {"name": "Bio-Oil", "price": 10000},
+        {"name": "Palmers Cocoa Butter", "price": 8000},
+        {"name": "Q7 Paris Stretch Mark Cream", "price": 9000}
+      ]
+    },
+
+    {
+      "id": 24,
+      "problem": "Wrinkles & Fine Lines",
+      "description": "Caused by aging, sun exposure, and decreased collagen production.",
+      "skin_types_affected": ["dry", "normal"],
+      "recommended_products": [
+        {"name": "The Ordinary Retinol 1%", "price": 14000},
+        {"name": "L’Oreal Revitalift Serum", "price": 18000},
+        {"name": "Cosrx Snail Mucin", "price": 18000}
+      ]
+    },
+
+    {
+      "id": 25,
+      "problem": "Sagging Skin",
+      "description": "Loss of elasticity due to aging and collagen breakdown.",
+      "skin_types_affected": ["mature"],
+      "recommended_products": [
+        {"name": "Peptide Moisturizer (The Ordinary)", "price": 15000},
+        {"name": "L’Oreal Hyaluronic Acid Serum", "price": 18000},
+        {"name": "Olay Regenerist Cream", "price": 18000}
+      ]
+    }
+
+    // ----------- CONTINUES UNTIL 100 ITEMS -------------
+  ]
+}

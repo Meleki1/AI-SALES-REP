@@ -1,0 +1,19 @@
+[project]
+name = "ai_sales_rep_backend"
+version = "1.0.0"
+description = "Backend for AI Sales Chatbot with Paystack integration"
+authors = [
+    { name = "Meleki Idris", email = "melekiolami00@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "requests",
+    "cryptography",
+    "python-dotenv",
+    "pydantic"
+]
+
+[tool.uv.scripts]
+start = "uvicorn sales_agent:app --host 0.0.0.0 --port $PORT"

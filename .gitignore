@@ -1,0 +1,5 @@
+__pycache__/
+secret.key
+.env
+leads.enc
+.gradio/

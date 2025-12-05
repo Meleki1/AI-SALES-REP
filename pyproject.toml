@@ -17,7 +17,8 @@ dependencies = [
     "autogen-core",
     "autogen-ext",
     "openai",
-    "paystackapi" 
+    "paystackapi",
+    "tiktoken" 
 ]
 
 [tool.poetry]

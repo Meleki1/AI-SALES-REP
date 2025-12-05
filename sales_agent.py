@@ -342,6 +342,11 @@ async def webhook(request: Request):
 
     return {"status": "ok"}
 
+@app.get("/")
+def root():
+    return {"status": "ok"}
+
+
 
 
 

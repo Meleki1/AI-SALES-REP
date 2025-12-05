@@ -1,5 +1,5 @@
 [project]
-name = "ai_sales_rep_backend"
+name = "ai_sales_rep"
 version = "1.0.0"
 description = "Backend for AI Sales Chatbot with Paystack integration"
 authors = [
@@ -15,5 +15,10 @@ dependencies = [
     "pydantic"
 ]
 
+[tool.uv]
+package-mode = false
+
 [tool.uv.scripts]
 start = "uvicorn sales_agent:app --host 0.0.0.0 --port $PORT"
+
+

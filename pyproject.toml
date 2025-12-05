@@ -12,7 +12,7 @@ dependencies = [
     "requests",
     "cryptography",
     "python-dotenv",
-    "pydantic"
+    "pydantic",
     "autogen-agentchat",
     "autogen-core",
     "autogen-ext"

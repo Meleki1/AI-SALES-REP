@@ -15,7 +15,9 @@ dependencies = [
     "pydantic",
     "autogen-agentchat",
     "autogen-core",
-    "autogen-ext"
+    "autogen-ext",
+    "openai",
+    "paystackapi" 
 ]
 
 [tool.poetry]

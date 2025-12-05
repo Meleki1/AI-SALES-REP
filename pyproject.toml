@@ -13,6 +13,9 @@ dependencies = [
     "cryptography",
     "python-dotenv",
     "pydantic"
+    "autogen-agentchat",
+    "autogen-core",
+    "autogen-ext
 ]
 
 [tool.poetry]

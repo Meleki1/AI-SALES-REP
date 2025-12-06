@@ -237,10 +237,11 @@ async def handle_customer_message(user_input: str, conversation_history=None):
 
 
 def load_key():
-    """Load encryption key from secret.key file using absolute path."""
-    key_path = BASE_DIR / "secret.key"
-    with open(key_path, "rb") as f:
-        return f.read()
+    """Load encryption key from environment variable instead of file."""
+    key = os.getenv("ENCRYPTION_KEY")
+    if key is None:
+        raise ValueError("ENCRYPTION_KEY environment variable not set on server.")
+    return key.encode()
 
 fernet = Fernet(load_key())
 

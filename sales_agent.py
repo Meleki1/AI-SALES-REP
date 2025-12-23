@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import re
 from cryptography.fernet import Fernet
+import requests
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.messages import TextMessage
 from autogen_core import CancellationToken

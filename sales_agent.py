@@ -235,7 +235,7 @@ async def handle_customer_message(user_input: str, conversation_history=None):
     return agent_response
 
 
-fernet = Fernet(load_key())
+
 
 def load_key():
     """Load encryption key from environment variable instead of file."""
@@ -243,6 +243,8 @@ def load_key():
     if key is None:
         raise ValueError("ENCRYPTION_KEY environment variable not set on server.")
     return key.encode()
+
+fernet = Fernet(load_key())
 
 
 def save_lead(text):
@@ -355,11 +357,14 @@ def send_telegram_message(chat_id, text):
 
     requests.post(url, json=payload)
 
+
+
+
+
 @app.post("/telegram/webhook")
 async def telegram_webhook(request: Request):
     data = await request.json()
 
-    # Ignore non-message updates
     if "message" not in data:
         return {"ok": True}
 
@@ -367,12 +372,9 @@ async def telegram_webhook(request: Request):
     text = data["message"].get("text", "")
 
     reply = await handle_customer_message(text)
-
     send_telegram_message(chat_id, reply)
 
     return {"ok": True}
-
-
 
 
 

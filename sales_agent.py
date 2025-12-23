@@ -349,6 +349,18 @@ async def webhook(request: Request):
 
 def send_telegram_message(chat_id, text):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
+
+    if not token:
+        print("❌ TELEGRAM_BOT_TOKEN missing")
+        return
+
+    if not text:
+        text = "⚠️ Empty response from AI."
+
+    # 🔴 Telegram message limit
+    if len(text) > 4000:
+        text = text[:4000]
+
     url = f"https://api.telegram.org/bot{token}/sendMessage"
 
     payload = {
@@ -356,7 +368,11 @@ def send_telegram_message(chat_id, text):
         "text": text
     }
 
-    requests.post(url, json=payload)
+    response = requests.post(url, json=payload)
+
+    print("📨 TELEGRAM SEND STATUS:", response.status_code)
+    print("📨 TELEGRAM SEND RESPONSE:", response.text)
+
 
 
 

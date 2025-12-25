@@ -370,14 +370,6 @@ async def telegram_webhook(request: Request):
 
 
 
-if __name__ == "__main__":
-    customer_text = input("Customer message: ").strip()
-
-    if not customer_text:
-        raise ValueError("Customer message cannot be empty.")
-
-    reply = asyncio.run(handle_customer_message(customer_text))
-    print(reply)
 
 
 

@@ -13,6 +13,9 @@ from knowledge import load_documents
 from payment import create_payment
 import time
 from fastapi import FastAPI, Request
+from db import get_conversation, save_conversation
+
+
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -148,7 +151,8 @@ sales_agent = AssistantAgent(
 )
 
 
-async def handle_customer_message(user_input: str, conversation_history=None):
+
+async def handle_customer_message(chat_id: int, user_input: str):
     """
     Send a customer message to the sales agent with conversation history.
     Automatically saves leads and processes payments when detected.
@@ -157,37 +161,16 @@ async def handle_customer_message(user_input: str, conversation_history=None):
         user_input: The current user message
         conversation_history: List of tuples (user_msg, agent_msg) from previous conversation
     """
-    # Build message list from conversation history
+    history = get_conversation(chat_id)
     messages = []
-    
-    if conversation_history:
-        # Convert Gradio history format to autogen messages
-        for item in conversation_history:
-            # Handle different history formats
-            if isinstance(item, (list, tuple)):
-                if len(item) >= 2:
-                    user_msg = item[0] if item[0] else ""
-                    agent_msg = item[1] if item[1] else ""
-                else:
-                    continue
-            else:
-                continue
-            
-            # Add user message if it exists
-            if user_msg:
-                messages.append(TextMessage(content=str(user_msg), source="user"))
-            # Add agent response if it exists
-            if agent_msg:
-                messages.append(TextMessage(content=str(agent_msg), source="SalesAgent"))
-    
-    # Add the current user message
+
+    if history:
+        messages.append(TextMessage(content=history, source="user"))
+
     messages.append(TextMessage(content=user_input, source="user"))
     
-    # Automatically save lead information if customer provides contact details
-    # This extracts name, phone, email, and address from the user's message
-    save_lead(user_input)
     
-    # Send all messages to the agent (this gives it full conversation context)
+    save_lead(user_input)
     response = await sales_agent.on_messages(
         messages,
         cancellation_token=CancellationToken(),
@@ -212,26 +195,8 @@ async def handle_customer_message(user_input: str, conversation_history=None):
             payment_match.group(0),
             payment_link
         )
-    # Check if agent response contains both email and amount (agent is ready to process payment)
-    else:
-        # Build full conversation text for extraction
-        full_conversation = user_input + " " + agent_response
-        if conversation_history:
-            for item in conversation_history:
-                if isinstance(item, (list, tuple)) and len(item) >= 2:
-                    full_conversation += " " + str(item[0]) + " " + str(item[1])
-        
-        # Extract email and amount from full conversation
-        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', full_conversation, re.IGNORECASE)
-        amount = extract_amount(full_conversation)
-        
-        # Process payment if we have both email and amount, and payment intent is detected
-        if email_match and amount and (detect_payment_intent(user_input) or detect_payment_intent(agent_response)):
-            email = email_match.group(0)
-            # Only process if payment link not already in response
-            if "payment link" not in agent_response.lower() and "authorization_url" not in agent_response.lower():
-                payment_link = process_payment(email, amount)
-                agent_response += f"\n\n{payment_link}"
+    updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
+    save_conversation(chat_id, updated_history)
     
     return agent_response
 

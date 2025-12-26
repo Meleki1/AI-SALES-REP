@@ -282,6 +282,7 @@ def extract_amount(text):
     return None
 
 def process_payment(email, amount):
+    print("💳 process_payment called with:", email, amount)
     """Process payment through Paystack and return payment link."""
     try:
         ref = f"order_{int(time.time())}"
@@ -299,6 +300,7 @@ def process_payment(email, amount):
             return "Invalid response from payment service."
     except Exception as e:
         return f"Error processing payment: {str(e)}"
+    
 
 # FastAPI app instance for webhook endpoint
 app = FastAPI()

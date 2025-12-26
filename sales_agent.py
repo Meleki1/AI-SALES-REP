@@ -353,7 +353,7 @@ async def telegram_webhook(request: Request):
     chat_id = data["message"]["chat"]["id"]
     text = data["message"].get("text", "")
 
-    reply = await handle_customer_message(text)
+    reply = await handle_customer_message(chat_id, text)
     send_telegram_message(chat_id, reply)
 
     return {"ok": True}

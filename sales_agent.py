@@ -274,9 +274,6 @@ def extract_amount(text):
 
 
 
-print("📧 Detected email:", email)
-print("💰 Detected amount:", amount)
-
 # Only generate payment if intent is detected
 if email and amount and detect_payment_intent(user_input):
     payment_link = process_payment(email, amount)

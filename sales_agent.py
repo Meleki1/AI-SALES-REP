@@ -197,8 +197,8 @@ async def handle_customer_message(chat_id: int, user_input: str):
    
     amount = extract_amount(user_input + " " + agent_response)
 
-   
-    if email and amount and detect_payment_intent(user_input):
+    if email and amount:
+        print("💳 Triggering payment for:", email, amount)
         payment_link = process_payment(email, amount)
         agent_response += f"\n\n{payment_link}"
 
@@ -277,17 +277,30 @@ def process_payment(email, amount):
     print("💳 process_payment called with:", email, amount)
     """Process payment through Paystack and return payment link."""
     try:
+        # Validate inputs
+        if not email or not isinstance(email, str):
+            return "Invalid email address provided."
+        
+        if amount is None or not isinstance(amount, (int, float)) or amount <= 0:
+            return "Invalid amount. Please provide a valid amount greater than 0."
+        
         ref = f"order_{int(time.time())}"
         response = create_payment(email, amount, ref)
 
         # Handle different response structures
+        # payment.py returns: {"status": True, "data": {"authorization_url": "..."}} on success
+        # Or: {"status": False, "message": "..."} on error
         if isinstance(response, dict):
-            if response.get("status") and response.get("data", {}).get("authorization_url"):
-                link = response["data"]["authorization_url"]
-                return f"Here is your secure payment link:\n{link}"
-            else:
-                error_msg = response.get("message", "Unknown error")
-                return f"Something went wrong while generating your payment link: {error_msg}"
+            # Check for successful response with authorization_url
+            if response.get("status") is True:
+                data = response.get("data", {})
+                if isinstance(data, dict) and data.get("authorization_url"):
+                    link = data["authorization_url"]
+                    return f"Here is your secure payment link:\n{link}"
+            
+            # Handle error responses
+            error_msg = response.get("message", "Unknown error occurred while generating payment link")
+            return f"Something went wrong while generating your payment link: {error_msg}"
         else:
             return "Invalid response from payment service."
     except Exception as e:

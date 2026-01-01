@@ -116,27 +116,33 @@ LEAD COLLECTION:
 - Always confirm the information back to the customer: "Got it! I have your name as [name], phone [phone], email [email], and address [address]. Is this correct?"
 
 PAYMENT PROCESSING:
-- When customer expresses intent to buy (uses words like "buy", "purchase", "order", "pay", "make payment"), you should:
-  1. First, collect all necessary information (name, phone, email, address)
-  2. Calculate the total amount for the products they want
-  3. Clearly state the total amount: "Your total comes to ₦[amount]"
-  4. Ask for their email address if not already collected: "What's your email address for the payment link?"
-  5. Once you have both the email and total amount, mention both in your response:
-     Example: "Perfect! I have your email as [email] and your total is ₦[amount]. Let me generate your payment link..."
-  6. When payment is required, wait for the system to generate the payment link. NEVER generate or guess payment links yourself.
-  7. The payment link will appear in your response automatically
-- Always confirm the amount before processing: "Just to confirm, your order total is ₦[amount]. Is that correct?"
-- After the payment link is generated, remind them: "Once payment is confirmed, we'll process your order and send you a confirmation."
-- Make sure to mention both the email and amount clearly in the same response when ready to process payment
-
-IMPORTANT NOTES:
-- Always ask if customer is ready to buy BEFORE asking for contact details
-- Be natural and conversational when collecting information - don't make it feel like an interrogation
-- If customer provides information in a single message (e.g., "My name is John, email is john@email.com, phone is 1234567890"), acknowledge all of it
-- When customer says they want to buy, immediately proceed to collect information and process payment
-- If payment link generation fails, apologize and ask them to try again or contact support
+ -When a customer expresses intent to buy (uses words like "buy", "purchase", "order", "pay", "make payment"):
+  1. FIRST collect all required details:
+     - Full name
+     - Phone number
+     - Email address
+     - Delivery address
+  2. Clearly calculate and state the total amount:
+     - Example: "Your total comes to ₦18,000."
+  3. Always confirm the amount before payment:
+     - Ask: "Just to confirm, your order total is ₦18,000. Is that correct?"
+  4. Once the customer confirms the amount:
+     - Acknowledge politely and WAIT.
+     - Do NOT say you are generating a payment link.
+     - Do NOT guess or write any payment link.
+     - Do NOT include placeholders like “[payment link here]”.
+  5. When payment is required:
+     - The system (not you) will handle payment link generation.
+     - If a payment link appears in your response, present it professionally.
+     - If no link appears, simply acknowledge and reassure the customer.
+  6. After a payment link is provided by the system:
+     - Remind the customer: 
+       "Once payment is confirmed, we will process your order and send you a confirmation."
+    IMPORTANT RULES:
+    - NEVER generate, guess, or describe a payment link yourself.
+    - NEVER say a payment link will be sent by email unless the system explicitly provides one.
+    - If payment link generation fails, apologize politely and ask the customer to try again or contact support.
 """
-
 
 api_key = os.getenv("OPENAI_API_KEY")
 
@@ -193,9 +199,10 @@ async def handle_customer_message(chat_id: int, user_input: str):
     amount = extract_amount(user_input + " " + agent_response)
 
    
-    if email and amount and detect_payment_intent(user_input):
+    if email and amount and (
+        detect_payment_intent(user_input) or has_confirmed_order(user_input)
+    ):
         payment_link = process_payment(email, amount)
-
         agent_response = (
             f"Perfect! I have your email as {email} "
             f"and your total is ₦{int(amount):,}.\n\n"
@@ -267,6 +274,11 @@ def detect_payment_intent(text):
     keywords = ["buy", "purchase", "order", "pay", "make payment", "checkout", "proceed to payment"]
     return any(word in text.lower() for word in keywords)
 
+def has_confirmed_order(text):
+    """Detect if user has confirmed their order."""
+    keywords = ["confirm", "confirmed", "yes", "correct", "that's right", "that is correct", "proceed"]
+    return any(word in text.lower() for word in keywords)
+
 def extract_amount(text):
     """
     Extract ONLY monetary values.
@@ -292,7 +304,7 @@ def extract_amount(text):
     )
     for amt in currency_matches:
         clean = amt.replace(",", "")
-        if len(clean) <= 7:  # prevents phone numbers
+        if len(clean) <= 7:  
             return float(clean)
 
     return None
@@ -301,8 +313,8 @@ def extract_amount(text):
 
 
 def process_payment(email, amount):
-    print("💳 process_payment called with:", email, amount)
     """Process payment through Paystack and return payment link."""
+    print("💳 process_payment called with:", email, amount)
     try:
         # Validate inputs
         if not email or not isinstance(email, str):

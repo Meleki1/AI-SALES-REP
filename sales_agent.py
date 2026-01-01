@@ -123,7 +123,7 @@ PAYMENT PROCESSING:
   4. Ask for their email address if not already collected: "What's your email address for the payment link?"
   5. Once you have both the email and total amount, mention both in your response:
      Example: "Perfect! I have your email as [email] and your total is ₦[amount]. Let me generate your payment link..."
-  6. The system will automatically detect the email and amount from your response and generate the payment link
+  6. When payment is required, wait for the system to generate the payment link. NEVER generate or guess payment links yourself.
   7. The payment link will appear in your response automatically
 - Always confirm the amount before processing: "Just to confirm, your order total is ₦[amount]. Is that correct?"
 - After the payment link is generated, remind them: "Once payment is confirmed, we'll process your order and send you a confirmation."
@@ -156,15 +156,10 @@ sales_agent = AssistantAgent(
 
 
 async def handle_customer_message(chat_id: int, user_input: str):
-    """
-    Handles a customer message with per-user memory, lead capture,
-    and safe payment processing.
-    """
-
-    
     history = get_conversation(chat_id)
     messages = []
 
+    
     if history:
         messages.append(TextMessage(content=history, source="user"))
 
@@ -197,18 +192,23 @@ async def handle_customer_message(chat_id: int, user_input: str):
    
     amount = extract_amount(user_input + " " + agent_response)
 
-    if email and amount and "confirm" in user_input.lower():
-        print("💳 Triggering payment for:", email, amount)
+   
+    if email and amount and detect_payment_intent(user_input):
         payment_link = process_payment(email, amount)
-        agent_response += f"\n\n{payment_link}"
 
+        agent_response = (
+            f"Perfect! I have your email as {email} "
+            f"and your total is ₦{int(amount):,}.\n\n"
+            f"{payment_link}\n\n"
+            "Once payment is confirmed, we will process your order."
+        )
 
     
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
     save_conversation(chat_id, updated_history)
 
-    
     return agent_response
+
 
 
 
@@ -314,11 +314,9 @@ def process_payment(email, amount):
         ref = f"order_{int(time.time())}"
         response = create_payment(email, amount, ref)
 
-        # Handle different response structures
-        # payment.py returns: {"status": True, "data": {"authorization_url": "..."}} on success
-        # Or: {"status": False, "message": "..."} on error
+        
         if isinstance(response, dict):
-            # Check for successful response with authorization_url
+            
             if response.get("status") is True:
                 data = response.get("data", {})
                 if isinstance(data, dict) and data.get("authorization_url"):

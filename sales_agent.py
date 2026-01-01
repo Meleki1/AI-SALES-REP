@@ -188,20 +188,15 @@ async def handle_customer_message(chat_id: int, user_input: str):
     else:
         agent_response = str(response)
     
-    # Check if agent response contains payment request format and process it
-    payment_match = re.search(r'PAYMENT_REQUEST:\s*email=([\w\.-]+@[\w\.-]+\.\w+),\s*amount=([\d.]+)', agent_response, re.IGNORECASE)
-    if payment_match:
-        email = payment_match.group(1)
-        amount = float(payment_match.group(2))
-        payment_link = process_payment(email, amount)
-        # Replace the placeholder with actual payment link
-        agent_response = agent_response.replace(
-            payment_match.group(0),
-            payment_link
-        )
+    email_match = re.search(
+    r'[\w\.-]+@[\w\.-]+\.\w+',
+    agent_response + " " + user_input
+)
+    email = email_match.group(0) if email_match else None
+
+
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
     save_conversation(chat_id, updated_history)
-    
     return agent_response
 
 
@@ -262,24 +257,20 @@ def detect_payment_intent(text):
     return any(word in text.lower() for word in keywords)
 
 def extract_amount(text):
-    """Extract payment amount from text (looks for currency symbols and numbers)."""
-    # Pattern for amounts like ₦5000, N5000, 5000, $50, etc.
-    amount_patterns = [
-        r'[₦N$]\s*(\d+(?:[.,]\d+)?)',  # Currency symbol followed by number
-        r'(\d+(?:[.,]\d+)?)\s*(?:naira|ngn|usd|dollars?)',  # Number followed by currency word
-        r'total[:\- ]+[₦N$]?\s*(\d+(?:[.,]\d+)?)',  # "total: ₦5000"
-        r'amount[:\- ]+[₦N$]?\s*(\d+(?:[.,]\d+)?)',  # "amount: ₦5000"
-    ]
-    
-    for pattern in amount_patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            amount_str = match.group(1).replace(',', '')
-            try:
-                return float(amount_str)
-            except ValueError:
-                continue
+    match = re.search(r'₦?\s*([\d,]+)', text)
+    if match:
+        return float(match.group(1).replace(",", ""))
     return None
+
+amount = extract_amount(agent_response + " " + user_input)
+
+print("📧 Detected email:", email)
+print("💰 Detected amount:", amount)
+
+# Only generate payment if intent is detected
+if email and amount and detect_payment_intent(user_input):
+    payment_link = process_payment(email, amount)
+    agent_response += f"\n\n{payment_link}"
 
 def process_payment(email, amount):
     print("💳 process_payment called with:", email, amount)

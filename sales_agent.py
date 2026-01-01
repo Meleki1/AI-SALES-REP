@@ -272,7 +272,7 @@ def extract_amount(text):
         return float(match.group(1).replace(",", ""))
     return None
 
-amount = extract_amount(agent_response + " " + user_input)
+
 
 print("📧 Detected email:", email)
 print("💰 Detected amount:", amount)

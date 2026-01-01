@@ -267,10 +267,30 @@ def detect_payment_intent(text):
     return any(word in text.lower() for word in keywords)
 
 def extract_amount(text):
-    match = re.search(r'₦?\s*([\d,]+)', text)
-    if match:
-        return float(match.group(1).replace(",", ""))
+    """
+    Safely extract a monetary amount like:
+    ₦4,500
+    N4500
+    4500
+    total is 4500
+    """
+
+    if not text:
+        return None
+
+    # Look for numbers with at least 1 digit
+    matches = re.findall(r'(?:₦|N)?\s*(\d{1,3}(?:,\d{3})+|\d+)', text)
+
+    if not matches:
+        return None
+
+    for amt in matches:
+        clean = amt.replace(",", "").strip()
+        if clean.isdigit():
+            return float(clean)
+
     return None
+
 
 
 def process_payment(email, amount):

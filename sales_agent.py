@@ -197,10 +197,11 @@ async def handle_customer_message(chat_id: int, user_input: str):
    
     amount = extract_amount(user_input + " " + agent_response)
 
-    if email and amount:
+    if email and amount and "confirm" in user_input.lower():
         print("💳 Triggering payment for:", email, amount)
         payment_link = process_payment(email, amount)
         agent_response += f"\n\n{payment_link}"
+
 
     
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
@@ -268,28 +269,34 @@ def detect_payment_intent(text):
 
 def extract_amount(text):
     """
-    Safely extract a monetary amount like:
-    ₦4,500
-    N4500
-    4500
-    total is 4500
+    Extract ONLY monetary values.
+    Ignores phone numbers and random long digits.
     """
 
     if not text:
         return None
 
-    # Look for numbers with at least 1 digit
-    matches = re.findall(r'(?:₦|N)?\s*(\d{1,3}(?:,\d{3})+|\d+)', text)
+    
+    total_match = re.search(
+        r'(?:total(?: amount)?(?: is)?|amount(?: is)?)\s*[:\-]?\s*(?:₦|N)?\s*([\d,]+)',
+        text,
+        re.IGNORECASE
+    )
+    if total_match:
+        return float(total_match.group(1).replace(",", ""))
 
-    if not matches:
-        return None
-
-    for amt in matches:
-        clean = amt.replace(",", "").strip()
-        if clean.isdigit():
+    
+    currency_matches = re.findall(
+        r'(?:₦|N)\s*([\d,]{3,})',
+        text
+    )
+    for amt in currency_matches:
+        clean = amt.replace(",", "")
+        if len(clean) <= 7:  # prevents phone numbers
             return float(clean)
 
     return None
+
 
 
 

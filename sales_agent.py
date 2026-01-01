@@ -273,12 +273,6 @@ def extract_amount(text):
     return None
 
 
-
-# Only generate payment if intent is detected
-if email and amount and detect_payment_intent(user_input):
-    payment_link = process_payment(email, amount)
-    agent_response += f"\n\n{payment_link}"
-
 def process_payment(email, amount):
     print("💳 process_payment called with:", email, amount)
     """Process payment through Paystack and return payment link."""

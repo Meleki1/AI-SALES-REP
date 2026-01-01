@@ -155,16 +155,13 @@ sales_agent = AssistantAgent(
 )
 
 
-
 async def handle_customer_message(chat_id: int, user_input: str):
     """
-    Send a customer message to the sales agent with conversation history.
-    Automatically saves leads and processes payments when detected.
-    
-    Args:
-        user_input: The current user message
-        conversation_history: List of tuples (user_msg, agent_msg) from previous conversation
+    Handles a customer message with per-user memory, lead capture,
+    and safe payment processing.
     """
+
+    
     history = get_conversation(chat_id)
     messages = []
 
@@ -172,31 +169,44 @@ async def handle_customer_message(chat_id: int, user_input: str):
         messages.append(TextMessage(content=history, source="user"))
 
     messages.append(TextMessage(content=user_input, source="user"))
-    
+
     
     save_lead(user_input)
+
+   
     response = await sales_agent.on_messages(
         messages,
         cancellation_token=CancellationToken(),
     )
+
     
-    # Extract just the text content from the response
-    if hasattr(response, 'chat_message') and hasattr(response.chat_message, 'content'):
+    if hasattr(response, "chat_message") and hasattr(response.chat_message, "content"):
         agent_response = response.chat_message.content
-    elif hasattr(response, 'content'):
+    elif hasattr(response, "content"):
         agent_response = response.content
     else:
         agent_response = str(response)
+
     
     email_match = re.search(
-    r'[\w\.-]+@[\w\.-]+\.\w+',
-    agent_response + " " + user_input
-)
+        r'[\w\.-]+@[\w\.-]+\.\w+',
+        user_input + " " + agent_response
+    )
     email = email_match.group(0) if email_match else None
 
+   
+    amount = extract_amount(user_input + " " + agent_response)
 
+   
+    if email and amount and detect_payment_intent(user_input):
+        payment_link = process_payment(email, amount)
+        agent_response += f"\n\n{payment_link}"
+
+    
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
     save_conversation(chat_id, updated_history)
+
+    
     return agent_response
 
 

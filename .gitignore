@@ -3,3 +3,6 @@ secret.key
 .env
 leads.enc
 .gradio/
+.db/
+chat_memory.db
+uv.lock

@@ -6,19 +6,22 @@ DB_PATH = BASE_DIR / "chat_memory.db"
 
 
 def init_db():
-    """Create conversations table if it does not exist."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS conversations (
             chat_id INTEGER PRIMARY KEY,
-            history TEXT
+            history TEXT,
+            payment_confirmed INTEGER DEFAULT 0
         )
     """)
 
     conn.commit()
     conn.close()
+
+
+
 
 
 def get_conversation(chat_id: int) -> str:
@@ -49,3 +52,32 @@ def save_conversation(chat_id: int, history: str):
 
     conn.commit()
     conn.close()
+    
+
+def set_payment_confirmed(chat_id: int):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "UPDATE conversations SET payment_confirmed = 1 WHERE chat_id = ?",
+        (chat_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def is_payment_confirmed(chat_id: int) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT payment_confirmed FROM conversations WHERE chat_id = ?",
+        (chat_id,)
+    )
+
+    row = cursor.fetchone()
+    conn.close()
+
+    return bool(row and row[0] == 1)
+

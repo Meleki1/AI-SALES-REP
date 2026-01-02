@@ -137,7 +137,7 @@ When a customer expresses intent to buy (e.g. "buy", "purchase", "order", "pay",
    - Do NOT include placeholders like "[payment link here]".
 
 5. Payment handling:
-   - The system (not you) automatically generates the payment link once all requirements are met.
+   - The system (not you) automatically generates the payment link once the user confirm the order.
    - If a payment link appears in your response, present it clearly and professionally.
    - Do NOT ask the customer to send another message to receive the link.
 
@@ -208,23 +208,27 @@ async def handle_customer_message(chat_id: int, user_input: str):
 
     state = get_order_state(history)
 
-# STEP 1: Ask for confirmation (ONLY ONCE)
+    # STEP 1: Ask for confirmation (ONLY ONCE)
     if email and amount and state == "COLLECTING_INFO":
         agent_response = (
-         f"Got it! I have your details.\n\n"
-         f"Your total comes to ₦{int(amount):,}.\n\n"
-         "Just to confirm, is this amount correct?"
-    )
+            "Got it! Here are your order details:\n\n"
+            f"📧 Email: {email}\n"
+            f"💰 Total Amount: ₦{int(amount):,}\n\n"
+            "Just to confirm, is this amount correct?"
+        )
+        history = mark_state(history, "AWAITING_CONFIRMATION")
 
-# STEP 2: Generate payment ONLY after confirmation
+    # STEP 2: Generate payment link AFTER confirmation
     elif email and amount and state == "AWAITING_CONFIRMATION" and detect_confirmation(user_input):
         payment_link = process_payment(email, amount)
+
         agent_response = (
-            f"Perfect! I have your email as {email} "
-            f"and your total is ₦{int(amount):,}.\n\n"
+            "Perfect! Your order is confirmed.\n\n"
             f"{payment_link}\n\n"
             "Once payment is confirmed, we will process your order."
-    )
+        )
+        history = mark_state(history, "PAYMENT_DONE")
+
 
 
    
@@ -235,14 +239,18 @@ async def handle_customer_message(chat_id: int, user_input: str):
 
     return agent_response
 
+
 def get_order_state(history: str) -> str:
-    if not history:
-        return "COLLECTING_INFO"
-    if "Just to confirm, your order total is" in history:
+    if "PAYMENT_DONE" in history:
+        return "PAYMENT_DONE"
+    if "AWAITING_CONFIRMATION" in history:
         return "AWAITING_CONFIRMATION"
-    if "Here is your secure payment link" in history:
-        return "PAYMENT_SENT"
     return "COLLECTING_INFO"
+
+def mark_state(history: str, state: str) -> str:
+    return f"{history}\n[{state}]"
+
+
 
 
 

@@ -276,11 +276,6 @@ def save_lead(text):
             f.write(encrypted + b'\n')
 
 
-def detect_payment_intent(text):
-    """Detect if user wants to make a payment."""
-    keywords = ["buy", "purchase", "order", "pay", "make payment", "checkout", "proceed to payment"]
-    return any(word in text.lower() for word in keywords)
-
 def detect_confirmation(text):
     """Detect if user has confirmed their order."""
     keywords = ["confirm", "confirmed", "yes", "correct", "that's right", "that is correct", "proceed"]
@@ -291,7 +286,6 @@ def extract_amount(text):
     Extract ONLY monetary values.
     Ignores phone numbers and random long digits.
     """
-
     if not text:
         return None
 

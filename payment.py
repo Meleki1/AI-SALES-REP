@@ -13,29 +13,24 @@ def create_payment(email, amount, reference):
             "status": False,
             "message": "PAYSTACK_SECRET_KEY is not set in environment variables"
         }
-    
+
     try:
-        # Transaction.initialize() requires the secret key to be passed
-        # The paystackapi library reads from environment or we pass it explicitly
         response = Transaction.initialize(
             secret_key=_paystack_secret,
             email=email,
-            amount=int(amount * 100),  # Paystack uses kobo (smallest currency unit)
+            amount=int(amount * 100),
             reference=reference
         )
-        
-        # Verify response structure
-        if isinstance(response, dict):
-            # Check if response has the expected structure
-            if response.get("status") and response.get("data"):
-                return response
-            else:
-                # Some API versions return data directly
-                return {
-                    "status": True,
-                    "data": response if isinstance(response, dict) else {"authorization_url": str(response)}
-                }
-        return response
+
+        # Expect Paystack standard response
+        if isinstance(response, dict) and response.get("status") is True:
+            return response
+
+        return {
+            "status": False,
+            "message": response.get("message", "Paystack initialization failed")
+        }
+
     except Exception as e:
         return {
             "status": False,

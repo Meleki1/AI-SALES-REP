@@ -206,14 +206,26 @@ async def handle_customer_message(chat_id: int, user_input: str):
     amount = extract_amount(user_input + " " + agent_response)
 
 
-    if email and amount and detect_confirmation(user_input):
+    state = get_order_state(history)
+
+# STEP 1: Ask for confirmation (ONLY ONCE)
+    if email and amount and state == "COLLECTING_INFO":
+        agent_response = (
+         f"Got it! I have your details.\n\n"
+         f"Your total comes to ₦{int(amount):,}.\n\n"
+         "Just to confirm, is this amount correct?"
+    )
+
+# STEP 2: Generate payment ONLY after confirmation
+    elif email and amount and state == "AWAITING_CONFIRMATION" and detect_confirmation(user_input):
         payment_link = process_payment(email, amount)
         agent_response = (
             f"Perfect! I have your email as {email} "
             f"and your total is ₦{int(amount):,}.\n\n"
             f"{payment_link}\n\n"
             "Once payment is confirmed, we will process your order."
-        )
+    )
+
 
    
 
@@ -223,6 +235,14 @@ async def handle_customer_message(chat_id: int, user_input: str):
 
     return agent_response
 
+def get_order_state(history: str) -> str:
+    if not history:
+        return "COLLECTING_INFO"
+    if "Just to confirm, your order total is" in history:
+        return "AWAITING_CONFIRMATION"
+    if "Here is your secure payment link" in history:
+        return "PAYMENT_SENT"
+    return "COLLECTING_INFO"
 
 
 

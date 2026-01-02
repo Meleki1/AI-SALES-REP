@@ -206,7 +206,7 @@ async def handle_customer_message(chat_id: int, user_input: str):
     amount = extract_amount(user_input + " " + agent_response)
 
 
-    if email and amount:
+    if email and amount and detect_confirmation(user_input):
         payment_link = process_payment(email, amount)
         agent_response = (
             f"Perfect! I have your email as {email} "
@@ -281,7 +281,7 @@ def detect_payment_intent(text):
     keywords = ["buy", "purchase", "order", "pay", "make payment", "checkout", "proceed to payment"]
     return any(word in text.lower() for word in keywords)
 
-def has_confirmed_order(text):
+def detect_confirmation(text):
     """Detect if user has confirmed their order."""
     keywords = ["confirm", "confirmed", "yes", "correct", "that's right", "that is correct", "proceed"]
     return any(word in text.lower() for word in keywords)

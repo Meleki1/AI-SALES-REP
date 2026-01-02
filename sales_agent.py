@@ -205,10 +205,8 @@ async def handle_customer_message(chat_id: int, user_input: str):
    
     amount = extract_amount(user_input + " " + agent_response)
 
-   
-    if email and amount and (
-        detect_payment_intent(user_input) or has_confirmed_order(user_input)
-    ):
+
+    if email and amount(user_input):
         payment_link = process_payment(email, amount)
         agent_response = (
             f"Perfect! I have your email as {email} "
@@ -216,6 +214,8 @@ async def handle_customer_message(chat_id: int, user_input: str):
             f"{payment_link}\n\n"
             "Once payment is confirmed, we will process your order."
         )
+
+   
 
     
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()

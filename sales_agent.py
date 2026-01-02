@@ -206,7 +206,7 @@ async def handle_customer_message(chat_id: int, user_input: str):
     amount = extract_amount(user_input + " " + agent_response)
 
 
-    if email and amount(user_input):
+    if email and amount:
         payment_link = process_payment(email, amount)
         agent_response = (
             f"Perfect! I have your email as {email} "

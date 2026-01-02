@@ -276,10 +276,18 @@ def save_lead(text):
             f.write(encrypted + b'\n')
 
 
-def detect_confirmation(text):
-    """Detect if user has confirmed their order."""
-    keywords = ["confirm", "confirmed", "yes", "correct", "that's right", "that is correct", "proceed"]
-    return any(word in text.lower() for word in keywords)
+def detect_confirmation(text: str) -> bool:
+    confirmations = [
+        "yes",
+        "correct",
+        "confirm",
+        "confirmed",
+        "that's right",
+        "okay",
+        "ok"
+    ]
+    return any(word in text.lower() for word in confirmations)
+
 
 def extract_amount(text):
     """

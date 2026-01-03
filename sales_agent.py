@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from knowledge import load_documents
 from payment import create_payment
 import time
+from db import get_user, upsert_user
 from fastapi import FastAPI, Request
 from db import init_db
 
@@ -105,8 +106,18 @@ sales_agent = AssistantAgent(
 
 
 async def handle_customer_message(chat_id: int, user_input: str):
-    history = get_conversation(chat_id) or ""
+    # 1️⃣ Load user from DB
+    user = get_user(chat_id)
 
+    state   = user[1] if user else "NEW"
+    name    = user[2] if user else None
+    phone   = user[3] if user else None
+    email   = user[4] if user else None
+    address = user[5] if user else None
+    amount  = user[6] if user else None
+    history = user[7] if user else ""
+
+    # 2️⃣ Send message to AI (for recommendations only)
     messages = []
     if history:
         messages.append(TextMessage(content=history, source="user"))
@@ -118,52 +129,99 @@ async def handle_customer_message(chat_id: int, user_input: str):
         cancellation_token=CancellationToken(),
     )
 
-    if hasattr(response, "chat_message"):
-        agent_response = response.chat_message.content
-    else:
-        agent_response = str(response)
+    agent_response = (
+        response.chat_message.content
+        if hasattr(response, "chat_message")
+        else str(response)
+    )
 
-    # ----------------------------
-    # Extract structured info
-    # ----------------------------
-    email = extract_email(history + " " + user_input)
-    amount = extract_amount(history)
+    # 3️⃣ Extract structured info from USER message
+    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
+    if email_match:
+        email = email_match.group(0)
 
-    if detect_confirmation(user_input):
-        history += "\n[CONFIRMED]"
+    amount_match = extract_amount(history + " " + agent_response)
+    if amount_match:
+        amount = amount_match
 
-    confirmed = "[CONFIRMED]" in history
-    payment_sent = "[PAYMENT_LINK_SENT]" in history
+    if "name" in user_input.lower():
+        name = user_input.strip()
 
-    # ----------------------------
-    # Enforce sales flow
-    # ----------------------------
-    if email and amount and not confirmed:
+    if re.search(r'\+?\d{10,15}', user_input):
+        phone = re.search(r'\+?\d{10,15}', user_input).group(0)
+
+    if "address" in user_input.lower():
+        address = user_input.strip()
+
+    # 4️⃣ STATE MACHINE
+    # -------------------------------------------------
+
+    # 🔹 STEP A — Collect details
+    if state in ["NEW", "COLLECTING_INFO"]:
+        missing = []
+        if not name: missing.append("full name")
+        if not phone: missing.append("phone number")
+        if not email: missing.append("email address")
+        if not address: missing.append("delivery address")
+
+        if missing:
+            agent_response = (
+                "To complete your order, I’ll need:\n"
+                + "\n".join(f"- {m}" for m in missing)
+            )
+            state = "COLLECTING_INFO"
+        else:
+            agent_response = (
+                "Got it! Here are your order details:\n\n"
+                f"👤 Name: {name}\n"
+                f"📞 Phone: {phone}\n"
+                f"📧 Email: {email}\n"
+                f"🏠 Address: {address}\n\n"
+                f"💰 Total Amount: ₦{int(amount):,}\n\n"
+                "Please confirm — is everything correct?"
+            )
+            state = "AWAITING_CONFIRMATION"
+
+    # 🔹 STEP B — Await confirmation
+    elif state == "AWAITING_CONFIRMATION":
+        if detect_confirmation(user_input):
+            payment_link = process_payment(email, amount)
+
+            agent_response = (
+                "Perfect! Your order is confirmed.\n\n"
+                f"{payment_link}\n\n"
+                "Once payment is confirmed, we will process your order."
+            )
+            state = "PAYMENT_SENT"
+        else:
+            agent_response = (
+                "Please confirm if the order details and amount are correct "
+                "so I can proceed."
+            )
+
+    # 🔹 STEP C — Payment already sent (LOCKED)
+    elif state == "PAYMENT_SENT":
         agent_response = (
-            "Got it! Here’s your order summary:\n\n"
-            f"📧 Email: {email}\n"
-            f"💰 Total Amount: ₦{int(amount):,}\n\n"
-            "Just to confirm — is this correct?"
+            "Your payment link has already been generated.\n\n"
+            "Once payment is completed, we’ll process your order. 🙏"
         )
 
-    elif email and amount and confirmed and not payment_sent:
-        payment_link = process_payment(email, amount)
-
-        agent_response = (
-            "Perfect! Your order is confirmed.\n\n"
-            f"{payment_link}\n\n"
-            "Once payment is confirmed, we will process your order."
-        )
-
-        history += "\n[PAYMENT_LINK_SENT]"
-
-    # ----------------------------
-    # Save conversation
-    # ----------------------------
+    # 5️⃣ Save back to DB
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
-    save_conversation(chat_id, updated_history)
+
+    upsert_user(
+        chat_id,
+        state=state,
+        name=name,
+        phone=phone,
+        email=email,
+        address=address,
+        amount=amount,
+        history=updated_history
+    )
 
     return agent_response
+
 
 
 

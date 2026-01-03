@@ -198,7 +198,7 @@ async def handle_customer_message(chat_id: int, user_input: str):
     
     email_match = re.search(
         r'[\w\.-]+@[\w\.-]+\.\w+',
-        user_input + " " + agent_response
+        user_input
     )
     email = email_match.group(0) if email_match else None
 
@@ -208,47 +208,57 @@ async def handle_customer_message(chat_id: int, user_input: str):
 
     state = get_order_state(history)
 
-    # STEP 1: Ask for confirmation (ONLY ONCE)
+    # STEP 1 — Ask for confirmation ONCE
     if email and amount and state == "COLLECTING_INFO":
         agent_response = (
             "Got it! Here are your order details:\n\n"
             f"📧 Email: {email}\n"
             f"💰 Total Amount: ₦{int(amount):,}\n\n"
-            "Just to confirm, is this amount correct?"
-        )
-        history = mark_state(history, "AWAITING_CONFIRMATION")
+            "Just to confirm, is this correct?"
+    )
 
-    # STEP 2: Generate payment link AFTER confirmation
-    elif email and amount and state == "AWAITING_CONFIRMATION" and detect_confirmation(user_input):
+        history += "\n[AWAITING_CONFIRMATION]"
+
+    # STEP 2 — Generate payment ONLY after confirmation
+    elif state == "AWAITING_CONFIRMATION" and user_input.strip().lower() in [
+        "yes", "correct", "confirm", "confirmed", "okay", "ok"
+    ]:
         payment_link = process_payment(email, amount)
 
         agent_response = (
             "Perfect! Your order is confirmed.\n\n"
             f"{payment_link}\n\n"
             "Once payment is confirmed, we will process your order."
-        )
-        history = mark_state(history, "PAYMENT_DONE")
+    )
+
+        history += "\n[PAYMENT_DONE]"
 
 
 
-   
 
-    
+
     updated_history = f"{history}\nUser: {user_input}\nBot: {agent_response}".strip()
     save_conversation(chat_id, updated_history)
+
 
     return agent_response
 
 
+
 def get_order_state(history: str) -> str:
-    if "PAYMENT_DONE" in history:
-        return "PAYMENT_DONE"
-    if "AWAITING_CONFIRMATION" in history:
+    if "[PAYMENT_DONE]" in history:
+        return "COMPLETED"
+    if "[AWAITING_CONFIRMATION]" in history:
         return "AWAITING_CONFIRMATION"
     return "COLLECTING_INFO"
 
+
 def mark_state(history: str, state: str) -> str:
     return f"{history}\n[{state}]"
+
+
+def has_confirmed(history: str) -> bool:
+    return "[CONFIRMED]" in history
 
 
 

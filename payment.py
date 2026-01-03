@@ -1,28 +1,42 @@
-# payment.py
+
 import os
 import time
 from paystackapi.transaction import Transaction
 
 PAYSTACK_SECRET = os.getenv("PAYSTACK_SECRET_KEY")
 
-def generate_payment_link(email, amount):
+def create_payment(email, amount, reference=None):
     if not PAYSTACK_SECRET:
-        return None, "Paystack key not set"
+        return {
+            "status": False,
+            "message": "Paystack key not set"
+        }
 
-    ref = f"order_{int(time.time())}"
+    if not reference:
+        reference = f"order_{int(time.time())}"
 
     try:
         response = Transaction.initialize(
             secret_key=PAYSTACK_SECRET,
             email=email,
             amount=int(amount * 100),
-            reference=ref
+            reference=reference
         )
 
         if response.get("status") and response.get("data"):
-            return response["data"]["authorization_url"], None
+            return {
+                "status": True,
+                "data": response["data"]
+            }
 
-        return None, response.get("message", "Payment failed")
+        return {
+            "status": False,
+            "message": response.get("message", "Payment failed")
+        }
 
     except Exception as e:
-        return None, str(e)
+        return {
+            "status": False,
+            "message": str(e)
+        }
+

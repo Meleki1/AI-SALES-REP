@@ -1,38 +1,28 @@
+# payment.py
 import os
-from paystackapi.paystack import Paystack
+import time
 from paystackapi.transaction import Transaction
 
-# Initialize Paystack only if secret key is available
-_paystack_secret = os.getenv("PAYSTACK_SECRET_KEY")
-paystack = Paystack(secret_key=_paystack_secret) if _paystack_secret else None
+PAYSTACK_SECRET = os.getenv("PAYSTACK_SECRET_KEY")
 
-def create_payment(email, amount, reference):
-    """Create a payment initialization request through Paystack and return payment link."""
-    if not _paystack_secret:
-        return {
-            "status": False,
-            "message": "PAYSTACK_SECRET_KEY is not set in environment variables"
-        }
+def generate_payment_link(email, amount):
+    if not PAYSTACK_SECRET:
+        return None, "Paystack key not set"
+
+    ref = f"order_{int(time.time())}"
 
     try:
         response = Transaction.initialize(
-            secret_key=_paystack_secret,
+            secret_key=PAYSTACK_SECRET,
             email=email,
             amount=int(amount * 100),
-            reference=reference
+            reference=ref
         )
 
-        # Expect Paystack standard response
-        if isinstance(response, dict) and response.get("status") is True:
-            return response
+        if response.get("status") and response.get("data"):
+            return response["data"]["authorization_url"], None
 
-        return {
-            "status": False,
-            "message": response.get("message", "Paystack initialization failed")
-        }
+        return None, response.get("message", "Payment failed")
 
     except Exception as e:
-        return {
-            "status": False,
-            "message": f"Payment initialization failed: {str(e)}"
-        }
+        return None, str(e)

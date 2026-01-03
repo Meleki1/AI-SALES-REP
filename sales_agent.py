@@ -109,6 +109,11 @@ async def handle_customer_message(chat_id: int, user_input: str):
     # 1️⃣ Load user from DB
     user = get_user(chat_id)
 
+    if user and user["state"] == "BROWSING":
+   
+        if not detect_buy_intent(user_input):
+            return agent_response
+
     state   = user[1] if user else "NEW"
     name    = user[2] if user else None
     phone   = user[3] if user else None
@@ -221,6 +226,16 @@ async def handle_customer_message(chat_id: int, user_input: str):
     )
 
     return agent_response
+
+
+def detect_buy_intent(text: str) -> bool:
+    keywords = [
+        "i want to buy", "i'll take", "i will take",
+        "i want this", "order", "purchase", "buy"
+    ]
+    text = text.lower()
+    return any(k in text for k in keywords)
+
 
 
 

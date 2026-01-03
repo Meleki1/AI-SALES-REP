@@ -11,7 +11,6 @@ from knowledge import load_documents
 from payment import create_payment
 import time
 from fastapi import FastAPI, Request
-from db import get_conversation, save_conversation
 from db import init_db
 
 init_db()
